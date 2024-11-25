@@ -182,7 +182,7 @@ class StatCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          SizedBox(
             height: 40, // Hauteur fixe pour la zone de titre
             child: Text(
               title,
