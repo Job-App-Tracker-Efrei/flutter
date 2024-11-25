@@ -20,8 +20,129 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SuiviCandidatures extends StatelessWidget {
+class AddCandidatureModal extends StatefulWidget {
+  const AddCandidatureModal({super.key});
+
+  @override
+  _AddCandidatureModalState createState() => _AddCandidatureModalState();
+}
+
+class _AddCandidatureModalState extends State<AddCandidatureModal> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _entrepriseController = TextEditingController();
+  final TextEditingController _posteController = TextEditingController();
+  String _statut = 'En cours';
+
+  final List<String> _statutOptions = ['En cours', 'Accepté', 'Refusé'];
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(
+        'Nouvelle Candidature',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _entrepriseController,
+              decoration: const InputDecoration(
+                labelText: 'Entreprise',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez entrer le nom de l\'entreprise';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _posteController,
+              decoration: const InputDecoration(
+                labelText: 'Poste',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Veuillez entrer le nom du poste';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _statut,
+              decoration: const InputDecoration(
+                labelText: 'Statut',
+                border: OutlineInputBorder(),
+              ),
+              items: _statutOptions.map((String status) {
+                return DropdownMenuItem<String>(
+                  value: status,
+                  child: Text(status),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _statut = newValue!;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // Fermer la modale
+          },
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              // Logique pour enregistrer la nouvelle candidature
+              final nouvelleCandidature = {
+                'entreprise': _entrepriseController.text,
+                'poste': _posteController.text,
+                'statut': _statut,
+              };
+
+              Navigator.of(context).pop(nouvelleCandidature);
+            }
+          },
+          child: const Text('Ajouter'),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    );
+  }
+}
+
+class SuiviCandidatures extends StatefulWidget {
   const SuiviCandidatures({super.key});
+
+  @override
+  _SuiviCandidaturesState createState() => _SuiviCandidaturesState();
+}
+
+class _SuiviCandidaturesState extends State<SuiviCandidatures> {
+  // Liste pour stocker les candidatures
+  final List<Map<String, String>> _candidatures = [
+    {'entreprise': 'TechCorp', 'poste': 'Développeur Full Stack', 'statut': 'En cours'},
+    {'entreprise': 'InnovSoft', 'poste': 'Ingénieur DevOps', 'statut': 'Refusé'},
+    {'entreprise': 'DataViz', 'poste': 'Data Scientist', 'statut': 'Accepté'},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +163,14 @@ class SuiviCandidatures extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Cartes de statistiques
-              const Wrap(
+              Wrap(
                 spacing: 16,
                 runSpacing: 16,
                 children: [
-                  StatCard(title: 'Candidatures\ntotales', value: '10'),
-                  StatCard(title: 'En cours', value: '5'),
-                  StatCard(title: 'Acceptées', value: '2'),
-                  StatCard(title: 'Refusées', value: '3'),
+                  StatCard(title: 'Candidatures\ntotales', value: _candidatures.length.toString()),
+                  StatCard(title: 'En cours', value: _candidatures.where((c) => c['statut'] == 'En cours').length.toString()),
+                  StatCard(title: 'Acceptées', value: _candidatures.where((c) => c['statut'] == 'Accepté').length.toString()),
+                  StatCard(title: 'Refusées', value: _candidatures.where((c) => c['statut'] == 'Refusé').length.toString()),
                 ],
               ),
               const SizedBox(height: 24),
@@ -81,7 +202,21 @@ class SuiviCandidatures extends StatelessWidget {
                   ),
                   IconButton(
                     icon: const Icon(Icons.add),
-                    onPressed: () {},
+                    onPressed: () {
+                      // Afficher la modale d'ajout de candidature
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const AddCandidatureModal();
+                        },
+                      ).then((nouvelleCandidature) {
+                        if (nouvelleCandidature != null) {
+                          setState(() {
+                            _candidatures.add(nouvelleCandidature);
+                          });
+                        }
+                      });
+                    },
                   ),
                 ],
               ),
@@ -97,50 +232,22 @@ class SuiviCandidatures extends StatelessWidget {
                     DataColumn(label: Text('Poste')),
                     DataColumn(label: Text('Statut')),
                   ],
-                  rows: [
-                    DataRow(cells: [
-                      const DataCell(Text('TechCorp')),
-                      const DataCell(Text('Développeur Full Stack')),
+                  rows: _candidatures.map((candidature) {
+                    return DataRow(cells: [
+                      DataCell(Text(candidature['entreprise']!)),
+                      DataCell(Text(candidature['poste']!)),
                       DataCell(
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: _getStatusColor(candidature['statut']!),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Text('En cours'),
+                          child: Text(candidature['statut']!),
                         ),
                       ),
-                    ]),
-                    DataRow(cells: [
-                      const DataCell(Text('InnovSoft')),
-                      const DataCell(Text('Ingénieur DevOps')),
-                      DataCell(
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text('Refusé'),
-                        ),
-                      ),
-                    ]),
-                    DataRow(cells: [
-                      const DataCell(Text('DataViz')),
-                      const DataCell(Text('Data Scientist')),
-                      DataCell(
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text('Accepté'),
-                        ),
-                      ),
-                    ]),
-                  ],
+                    ]);
+                  }).toList(),
                 ),
               ),
             ],
@@ -148,6 +255,20 @@ class SuiviCandidatures extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Fonction pour obtenir la couleur du statut
+  Color _getStatusColor(String statut) {
+    switch (statut) {
+      case 'En cours':
+        return Colors.blue.withOpacity(0.1);
+      case 'Accepté':
+        return Colors.green.withOpacity(0.1);
+      case 'Refusé':
+        return Colors.red.withOpacity(0.1);
+      default:
+        return Colors.grey.withOpacity(0.1);
+    }
   }
 }
 
