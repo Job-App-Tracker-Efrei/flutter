@@ -49,4 +49,4 @@ jobs:
           pod install --project-directory=ios
 
       - name: Build iOS
-        run: flutter build ios
+        run: flutter build ios --release --no-codesign
