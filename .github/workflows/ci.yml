@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -24,10 +25,10 @@ jobs:
 
       - name: Run Tests
         run: flutter test
-    
 
   build_ios:
-    runs-on: ubuntu-latest
+    name: Build iOS 🍏
+    runs-on: macos-latest
     needs: [test]
 
     steps:
@@ -41,6 +42,11 @@ jobs:
 
       - name: Get Flutter Dependencies
         run: flutter pub get
+
+      - name: Install Cocoapods
+        run: |
+          sudo gem install cocoapods
+          pod install --project-directory=ios
 
       - name: Build iOS
         run: flutter build ios
