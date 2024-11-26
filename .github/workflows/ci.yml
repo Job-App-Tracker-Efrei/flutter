@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+
+      - name: analyze
+        run: flutter analyze
+
+      - name: Run Tests
+        run: flutter test
+    
+
+  build_ios:
+    runs-on: ubuntu-latest
+    needs: [test]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Get Flutter Dependencies
+        run: flutter pub get
+
+      - name: Build iOS
+        run: flutter build ios
