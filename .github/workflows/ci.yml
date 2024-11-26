@@ -70,7 +70,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install openjdk-17-jdk
-          sudo update-alternatives --config java
+          sudo update-alternatives --config java <<< "2" # Select Java 17 automatically
           java -version # Verify Java 17
 
       - name: Get Flutter Dependencies
