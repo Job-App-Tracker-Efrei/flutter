@@ -195,17 +195,29 @@ class _SuiviCandidaturesState extends State<SuiviCandidatures> {
               return [
                 const PopupMenuItem<String>(
                   value: 'signOut',
-                  child: ListTile(
-                    leading: Icon(Icons.logout, color: Colors.red),
-                    title: Text(
-                      'Se déconnecter',
-                      style: TextStyle(color: Colors.red),
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.red, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Se déconnecter',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ];
             },
-          )
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            offset: const Offset(0, 50), // Positionner le menu plus bas
+            elevation: 4, // Ajouter une ombre pour plus de profondeur
+          ),
         ],
       ),
       body: SingleChildScrollView(
