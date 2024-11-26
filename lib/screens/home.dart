@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
 
     // Navigate to login screen and remove all previous routes
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => AuthPage()),
+      MaterialPageRoute(builder: (context) => const AuthPage()),
       (Route<dynamic> route) => false,
     );
   } catch (e) {
