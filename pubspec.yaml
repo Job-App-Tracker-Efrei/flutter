@@ -36,6 +36,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   google_sign_in: ^6.2.2
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +68,8 @@ flutter:
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
+  assets:
+    - assets/logo-google.png
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
