@@ -17,10 +17,8 @@ class AuthPageState extends State<AuthPage> {
     final googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
       // Handle successful Google sign-in
-      
     } else {
       // Handle Google sign-in failure
-    
     }
   }
 
