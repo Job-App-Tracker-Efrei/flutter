@@ -69,8 +69,5 @@ jobs:
       - name: Get Flutter Dependencies
         run: flutter pub get
 
-      - name: Clean Gradle cache
-        run: ./gradlew clean
-
       - name: Build Android
         run: flutter build appbundle --release
