@@ -52,8 +52,7 @@ jobs:
         run: flutter build ios --release --no-codesign
 
   build_android:
-    name: Build Android 🤖
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [test]
 
     steps:
@@ -68,5 +67,10 @@ jobs:
       - name: Get Flutter Dependencies
         run: flutter pub get
 
-      - name: Build Android
-        run: flutter build apk --release
+      - name: Install Cocoapods
+        run: |
+          sudo gem install cocoapods
+          pod install --project-directory=ios
+
+      - name: Build iOS
+        run: flutter build appbundle --release
