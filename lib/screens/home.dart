@@ -23,19 +23,34 @@ class _HomeState extends State<Home> {
     _jobService.setContext(context);
   }
 
-  void _editerCandidature(JobApplication candidature) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditCandidaturePage(candidature: candidature),
-      ),
-    );
+ void _editerCandidature(JobApplication candidature) async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditCandidaturePage(candidature: candidature),
+    ),
+  );
 
-    if (result != null) {
+  if (result != null) {
+    if (result == 'delete') {
+      // Only delete if id is not null
+      if (candidature.id != null) {
+        await _jobService.deleteJobApplication(candidature.id!);
+      } else {
+        // Handle case where id is null (maybe show an error)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Impossible de supprimer cette candidature'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else {
       // Update the job application in Firestore
       await _jobService.updateJobApplication(result);
     }
   }
+}
 
   void _ajouterCandidature() {
     showDialog(
@@ -151,19 +166,22 @@ class _HomeState extends State<Home> {
                       StatCard(
                           title: 'En cours',
                           value: candidatures
-                              .where((c) => c.status == JobApplicationStatus.pending)
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.pending)
                               .length
                               .toString()),
                       StatCard(
                           title: 'Acceptées',
                           value: candidatures
-                              .where((c) => c.status == JobApplicationStatus.accepted)
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.accepted)
                               .length
                               .toString()),
                       StatCard(
                           title: 'Refusées',
                           value: candidatures
-                              .where((c) => c.status == JobApplicationStatus.rejected)
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.rejected)
                               .length
                               .toString()),
                     ],
@@ -240,8 +258,7 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             DataCell(Text(
-                              '${candidature.date.day}/${candidature.date.month}/${candidature.date.year}'
-                            )),
+                                '${candidature.date.day}/${candidature.date.month}/${candidature.date.year}')),
                           ],
                         );
                       }).toList(),
@@ -296,8 +313,8 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
   DateTime? _datePostulation;
 
   final List<JobApplicationStatus> _statutOptions = [
-    JobApplicationStatus.pending, 
-    JobApplicationStatus.accepted, 
+    JobApplicationStatus.pending,
+    JobApplicationStatus.accepted,
     JobApplicationStatus.rejected
   ];
 
@@ -308,7 +325,7 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
-    
+
     if (picked != null) {
       setState(() {
         _datePostulation = picked;
@@ -395,9 +412,9 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
               children: [
                 Expanded(
                   child: Text(
-                    _datePostulation != null 
-                      ? 'Date de postulation: ${_datePostulation!.day}/${_datePostulation!.month}/${_datePostulation!.year}'
-                      : 'Aucune date sélectionnée',
+                    _datePostulation != null
+                        ? 'Date de postulation: ${_datePostulation!.day}/${_datePostulation!.month}/${_datePostulation!.year}'
+                        : 'Aucune date sélectionnée',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),

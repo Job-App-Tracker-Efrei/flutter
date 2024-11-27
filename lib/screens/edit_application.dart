@@ -134,7 +134,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Logique pour supprimer la candidature
-                      Navigator.of(context).pop(null); // On pourrait envoyer `null` pour indiquer la suppression
+                      Navigator.of(context).pop('delete');
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
