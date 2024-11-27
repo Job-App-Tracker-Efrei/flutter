@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/models/job_model.dart';
 
 class EditCandidaturePage extends StatefulWidget {
-  final Map<String, String> candidature;
+  final JobApplication candidature;
 
   const EditCandidaturePage({super.key, required this.candidature});
 
@@ -12,18 +13,22 @@ class EditCandidaturePage extends StatefulWidget {
 class _EditCandidaturePageState extends State<EditCandidaturePage> {
   late TextEditingController _entrepriseController;
   late TextEditingController _posteController;
-  late String _statut;
+  late JobApplicationStatus _statut;
 
-  final List<String> _statutOptions = ['En cours', 'Accepté', 'Refusé'];
+  final List<JobApplicationStatus> _statutOptions = [
+    JobApplicationStatus.pending,
+    JobApplicationStatus.accepted,
+    JobApplicationStatus.rejected,
+  ];
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    _entrepriseController = TextEditingController(text: widget.candidature['entreprise']);
-    _posteController = TextEditingController(text: widget.candidature['poste']);
-    _statut = widget.candidature['statut']!;
+    _entrepriseController = TextEditingController(text: widget.candidature.company);
+    _posteController = TextEditingController(text: widget.candidature.position);
+    _statut = widget.candidature.status;
   }
 
   @override
@@ -37,7 +42,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ta Candidature'),
+        title: const Text('Modifier la candidature'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -46,7 +51,6 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
               TextFormField(
                 controller: _entrepriseController,
                 decoration: InputDecoration(
@@ -81,7 +85,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                 },
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
+              DropdownButtonFormField<JobApplicationStatus>(
                 value: _statut,
                 decoration: InputDecoration(
                   labelText: 'Statut',
@@ -90,44 +94,78 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                   ),
                   prefixIcon: const Icon(Icons.check_circle),
                 ),
-                items: _statutOptions.map((String status) {
-                  return DropdownMenuItem<String>(
+                items: _statutOptions.map((JobApplicationStatus status) {
+                  return DropdownMenuItem<JobApplicationStatus>(
                     value: status,
-                    child: Text(status),
+                    child: Text(_getStatusText(status)),
                   );
                 }).toList(),
-                onChanged: (String? newValue) {
+                onChanged: (JobApplicationStatus? newValue) {
                   setState(() {
                     _statut = newValue!;
                   });
                 },
               ),
               const SizedBox(height: 24),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      final candidatureMiseAJour = {
-                        'entreprise': _entrepriseController.text,
-                        'poste': _posteController.text,
-                        'statut': _statut,
-                      };
-                      Navigator.of(context).pop(candidatureMiseAJour);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Mettre à jour la candidature
+                        final updatedCandidature = widget.candidature
+                          ..company = _entrepriseController.text
+                          ..position = _posteController.text
+                          ..status = _statut
+                          ..lastUpdate = DateTime.now();
+
+                        Navigator.of(context).pop(updatedCandidature);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    child: const Text('Enregistrer'),
                   ),
-                  child: const Text('Enregistrer'),
-                ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Logique pour supprimer la candidature
+                      Navigator.of(context).pop(null); // On pourrait envoyer `null` pour indiquer la suppression
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      backgroundColor: Colors.red, // Couleur rouge pour indiquer la suppression
+                    ),
+                    child: const Text('Supprimer',
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  String _getStatusText(JobApplicationStatus status) {
+    switch (status) {
+      case JobApplicationStatus.pending:
+        return 'En cours';
+      case JobApplicationStatus.accepted:
+        return 'Accepté';
+      case JobApplicationStatus.rejected:
+        return 'Refusé';
+      default:
+        return '';
+    }
   }
 }
