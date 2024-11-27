@@ -57,8 +57,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '922794878150',
     projectId: 'job-tracker-efrei',
     storageBucket: 'job-tracker-efrei.firebasestorage.app',
-    iosClientId: '922794878150-g79u17ou49n5b5apiop2vs5gj8skli04.apps.googleusercontent.com',
-    iosBundleId: 'com.example.mobile',
+    iosClientId:
+        '922794878150-g79u17ou49n5b5apiop2vs5gj8skli04.apps.googleusercontent.com',
+    iosBundleId: 'com.jobapptracker.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -67,8 +68,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '922794878150',
     projectId: 'job-tracker-efrei',
     storageBucket: 'job-tracker-efrei.firebasestorage.app',
-    iosClientId: '922794878150-g79u17ou49n5b5apiop2vs5gj8skli04.apps.googleusercontent.com',
-    iosBundleId: 'com.example.mobile',
+    iosClientId:
+        '922794878150-g79u17ou49n5b5apiop2vs5gj8skli04.apps.googleusercontent.com',
+    iosBundleId: 'com.jobapptracker.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
