@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/auth.dart';
+import 'package:mobile/screens/edit_application.dart';
+import 'package:mobile/services/job_service.dart';
+import 'package:mobile/models/job_model.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,59 +13,74 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  // Liste pour stocker les candidatures
-  final List<Map<String, String>> _candidatures = [
-    {
-      'entreprise': 'TechCorp',
-      'poste': 'Développeur Full Stack',
-      'statut': 'En cours'
-    },
-    {
-      'entreprise': 'InnovSoft',
-      'poste': 'Ingénieur DevOps',
-      'statut': 'Refusé'
-    },
-    {'entreprise': 'DataViz', 'poste': 'Data Scientist', 'statut': 'Accepté'},
-  ];
+  final JobApplicationService _jobService = JobApplicationService();
+  final TextEditingController _searchController = TextEditingController();
 
-  // Fonction pour éditer une candidature
-  void _editerCandidature(int index) async {
-    // Await the result from EditCandidaturePage when implemented
-    // final result = await Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => EditCandidaturePage(candidature: _candidatures[index]),
-    //   ),
-    // );
-
-    // if (result != null) {
-    //   setState(() {
-    //     _candidatures[index] = result;
-    //   });
-    // }
+  @override
+  void initState() {
+    super.initState();
+    // Set context for SnackBar in job service
+    _jobService.setContext(context);
   }
 
-  // Fonction pour se déconnecter
- void _signOut(BuildContext context) async {
-  try {
-    // Sign out from Firebase
-    await FirebaseAuth.instance.signOut();
-
-    // Navigate to login screen and remove all previous routes
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const AuthPage()),
-      (Route<dynamic> route) => false,
-    );
-  } catch (e) {
-    // Handle sign-out errors
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Erreur lors de la déconnexion : ${e.toString()}'),
-        backgroundColor: Colors.red,
+  void _editerCandidature(JobApplication candidature) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCandidaturePage(candidature: candidature),
       ),
     );
+
+    if (result != null) {
+      if (result == 'delete') {
+        // Only delete if id is not null
+        if (candidature.id != null) {
+          await _jobService.deleteJobApplication(candidature.id!);
+        } else {
+          // Handle case where id is null (maybe show an error)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Impossible de supprimer cette candidature'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // Update the job application in Firestore
+        await _jobService.updateJobApplication(result);
+      }
+    }
   }
- }
+
+  void _ajouterCandidature() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const AddCandidatureModal();
+      },
+    ).then((nouvelleCandidature) {
+      if (nouvelleCandidature != null) {
+        _jobService.addJobApplication(nouvelleCandidature);
+      }
+    });
+  }
+
+  void _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AuthPage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors de la déconnexion : ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,144 +124,176 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Cartes de statistiques
-              Wrap(
-                spacing: 16,
-                runSpacing: 16,
+      body: StreamBuilder<List<JobApplication>>(
+        stream: _jobService.getJobApplications(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  StatCard(
-                      title: 'Candidatures\ntotales',
-                      value: _candidatures.length.toString()),
-                  StatCard(
-                      title: 'En cours',
-                      value: _candidatures
-                          .where((c) => c['statut'] == 'En cours')
-                          .length
-                          .toString()),
-                  StatCard(
-                      title: 'Acceptées',
-                      value: _candidatures
-                          .where((c) => c['statut'] == 'Accepté')
-                          .length
-                          .toString()),
-                  StatCard(
-                      title: 'Refusées',
-                      value: _candidatures
-                          .where((c) => c['statut'] == 'Refusé')
-                          .length
-                          .toString()),
+                  const Text('Aucune candidature trouvée'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _ajouterCandidature,
+                    child: const Text('Ajouter une candidature'),
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
-              // Barre de recherche
-              Row(
+            );
+          }
+
+          final candidatures = snapshot.data!;
+
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Entreprise',
-                    style: TextStyle(fontSize: 16),
+                  // Cartes de statistiques
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 16,
+                    children: [
+                      StatCard(
+                          title: 'Candidatures\ntotales',
+                          value: candidatures.length.toString()),
+                      StatCard(
+                          title: 'En cours',
+                          value: candidatures
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.pending)
+                              .length
+                              .toString()),
+                      StatCard(
+                          title: 'Acceptées',
+                          value: candidatures
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.accepted)
+                              .length
+                              .toString()),
+                      StatCard(
+                          title: 'Refusées',
+                          value: candidatures
+                              .where((c) =>
+                                  c.status == JobApplicationStatus.rejected)
+                              .length
+                              .toString()),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: SizedBox(
-                      height: 40,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Nom de l\'entreprise',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 24),
+                  // Barre de recherche
+                  Row(
+                    children: [
+                      const Text(
+                        'Entreprise',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: SizedBox(
+                          height: 40,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Nom de l\'entreprise',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                            ),
                           ),
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text('Filtrer'),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      // Afficher la modale d'ajout de candidature
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const AddCandidatureModal();
+                      const SizedBox(width: 16),
+                      TextButton(
+                        onPressed: () {
+                          // TODO: Implement search functionality
                         },
-                      ).then((nouvelleCandidature) {
-                        if (nouvelleCandidature != null) {
-                          setState(() {
-                            _candidatures.add(nouvelleCandidature);
-                          });
-                        }
-                      });
-                    },
+                        child: const Text('Filtrer'),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: _ajouterCandidature,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  // Tableau
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      horizontalMargin: 0,
+                      columnSpacing: 40,
+                      showCheckboxColumn: false,
+                      columns: const [
+                        DataColumn(label: Text('Entreprise')),
+                        DataColumn(label: Text('Poste')),
+                        DataColumn(label: Text('Statut')),
+                        DataColumn(label: Text('Date')),
+                      ],
+                      rows: candidatures.map((candidature) {
+                        return DataRow(
+                          onSelectChanged: (_) {
+                            _editerCandidature(candidature);
+                          },
+                          cells: [
+                            DataCell(Text(candidature.company)),
+                            DataCell(Text(candidature.position)),
+                            DataCell(
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(candidature.status),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Text(_getStatusText(candidature.status)),
+                              ),
+                            ),
+                            DataCell(Text(
+                                '${candidature.date.day}/${candidature.date.month}/${candidature.date.year}')),
+                          ],
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              // Tableau
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  horizontalMargin: 0,
-                  columnSpacing: 40,
-                  showCheckboxColumn: false,
-                  columns: const [
-                    DataColumn(label: Text('Entreprise')),
-                    DataColumn(label: Text('Poste')),
-                    DataColumn(label: Text('Statut')),
-                  ],
-                  rows: _candidatures.map((candidature) {
-                    return DataRow(
-                      onSelectChanged: (_) {
-                        _editerCandidature(_candidatures.indexOf(candidature));
-                      },
-                      cells: [
-                        DataCell(Text(candidature['entreprise']!)),
-                        DataCell(Text(candidature['poste']!)),
-                        DataCell(
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(candidature['statut']!),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(candidature['statut']!),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   // Fonction pour obtenir la couleur du statut
-  Color _getStatusColor(String statut) {
+  Color _getStatusColor(JobApplicationStatus statut) {
     switch (statut) {
-      case 'En cours':
+      case JobApplicationStatus.pending:
         return Colors.blue.withOpacity(0.1);
-      case 'Accepté':
+      case JobApplicationStatus.accepted:
         return Colors.green.withOpacity(0.1);
-      case 'Refusé':
+      case JobApplicationStatus.rejected:
         return Colors.red.withOpacity(0.1);
-      default:
-        return Colors.grey.withOpacity(0.1);
+    }
+  }
+
+  // Fonction pour obtenir le texte du statut
+  String _getStatusText(JobApplicationStatus statut) {
+    switch (statut) {
+      case JobApplicationStatus.pending:
+        return 'En cours';
+      case JobApplicationStatus.accepted:
+        return 'Accepté';
+      case JobApplicationStatus.rejected:
+        return 'Refusé';
     }
   }
 }
@@ -259,9 +309,41 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _entrepriseController = TextEditingController();
   final TextEditingController _posteController = TextEditingController();
-  String _statut = 'En cours';
+  JobApplicationStatus _statut = JobApplicationStatus.pending;
+  DateTime? _datePostulation;
 
-  final List<String> _statutOptions = ['En cours', 'Accepté', 'Refusé'];
+  final List<JobApplicationStatus> _statutOptions = [
+    JobApplicationStatus.pending,
+    JobApplicationStatus.accepted,
+    JobApplicationStatus.rejected
+  ];
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _datePostulation = picked;
+      });
+    }
+  }
+
+  // Helper method to get status text
+  String _getStatusText(JobApplicationStatus status) {
+    switch (status) {
+      case JobApplicationStatus.pending:
+        return 'En cours';
+      case JobApplicationStatus.accepted:
+        return 'Accepté';
+      case JobApplicationStatus.rejected:
+        return 'Refusé';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -306,23 +388,41 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
               },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<JobApplicationStatus>(
               value: _statut,
               decoration: const InputDecoration(
                 labelText: 'Statut',
                 border: OutlineInputBorder(),
               ),
-              items: _statutOptions.map((String status) {
-                return DropdownMenuItem<String>(
+              items: _statutOptions.map((JobApplicationStatus status) {
+                return DropdownMenuItem<JobApplicationStatus>(
                   value: status,
-                  child: Text(status),
+                  child: Text(_getStatusText(status)),
                 );
               }).toList(),
-              onChanged: (String? newValue) {
+              onChanged: (JobApplicationStatus? newValue) {
                 setState(() {
                   _statut = newValue!;
                 });
               },
+            ),
+            const SizedBox(height: 16),
+            // Date picker
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _datePostulation != null
+                        ? 'Date de postulation: ${_datePostulation!.day}/${_datePostulation!.month}/${_datePostulation!.year}'
+                        : 'Aucune date sélectionnée',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: _selectDate,
+                ),
+              ],
             ),
           ],
         ),
@@ -337,11 +437,12 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              final nouvelleCandidature = {
-                'entreprise': _entrepriseController.text,
-                'poste': _posteController.text,
-                'statut': _statut,
-              };
+              final nouvelleCandidature = JobApplication(
+                company: _entrepriseController.text,
+                position: _posteController.text,
+                status: _statut,
+                date: _datePostulation ?? DateTime.now(),
+              );
 
               Navigator.of(context).pop(nouvelleCandidature);
             }
