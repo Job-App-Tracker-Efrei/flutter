@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/auth.dart';
+import 'package:mobile/screens/edit_application.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -27,19 +28,18 @@ class _HomeState extends State<Home> {
 
   // Fonction pour éditer une candidature
   void _editerCandidature(int index) async {
-    // Await the result from EditCandidaturePage when implemented
-    // final result = await Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => EditCandidaturePage(candidature: _candidatures[index]),
-    //   ),
-    // );
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCandidaturePage(candidature: _candidatures[index]),
+      ),
+    );
 
-    // if (result != null) {
-    //   setState(() {
-    //     _candidatures[index] = result;
-    //   });
-    // }
+    if (result != null) {
+      setState(() {
+        _candidatures[index] = result;
+      });
+    }
   }
 
   // Fonction pour se déconnecter
