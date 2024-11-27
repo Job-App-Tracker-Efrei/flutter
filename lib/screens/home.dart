@@ -23,34 +23,34 @@ class _HomeState extends State<Home> {
     _jobService.setContext(context);
   }
 
- void _editerCandidature(JobApplication candidature) async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => EditCandidaturePage(candidature: candidature),
-    ),
-  );
+  void _editerCandidature(JobApplication candidature) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCandidaturePage(candidature: candidature),
+      ),
+    );
 
-  if (result != null) {
-    if (result == 'delete') {
-      // Only delete if id is not null
-      if (candidature.id != null) {
-        await _jobService.deleteJobApplication(candidature.id!);
+    if (result != null) {
+      if (result == 'delete') {
+        // Only delete if id is not null
+        if (candidature.id != null) {
+          await _jobService.deleteJobApplication(candidature.id!);
+        } else {
+          // Handle case where id is null (maybe show an error)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Impossible de supprimer cette candidature'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } else {
-        // Handle case where id is null (maybe show an error)
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Impossible de supprimer cette candidature'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        // Update the job application in Firestore
+        await _jobService.updateJobApplication(result);
       }
-    } else {
-      // Update the job application in Firestore
-      await _jobService.updateJobApplication(result);
     }
   }
-}
 
   void _ajouterCandidature() {
     showDialog(
@@ -224,7 +224,7 @@ class _HomeState extends State<Home> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 5),
                   // Tableau
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
