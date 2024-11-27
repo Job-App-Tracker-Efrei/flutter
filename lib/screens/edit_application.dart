@@ -14,6 +14,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
   late TextEditingController _entrepriseController;
   late TextEditingController _posteController;
   late JobApplicationStatus _statut;
+  late DateTime _datePostulation;
 
   final List<JobApplicationStatus> _statutOptions = [
     JobApplicationStatus.pending,
@@ -29,6 +30,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
     _entrepriseController = TextEditingController(text: widget.candidature.company);
     _posteController = TextEditingController(text: widget.candidature.position);
     _statut = widget.candidature.status;
+    _datePostulation = widget.candidature.date;
   }
 
   @override
@@ -36,6 +38,21 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
     _entrepriseController.dispose();
     _posteController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _datePostulation,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _datePostulation = picked;
+      });
+    }
   }
 
   @override
@@ -106,6 +123,22 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                   });
                 },
               ),
+              const SizedBox(height: 16),
+              // Date picker
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Date de postulation: ${_datePostulation.day}/${_datePostulation.month}/${_datePostulation.year}',
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: _selectDate,
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -118,6 +151,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                           ..company = _entrepriseController.text
                           ..position = _posteController.text
                           ..status = _statut
+                          ..date = _datePostulation
                           ..lastUpdate = DateTime.now();
 
                         Navigator.of(context).pop(updatedCandidature);
