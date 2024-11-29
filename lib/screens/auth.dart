@@ -18,8 +18,20 @@ class AuthPageState extends State<AuthPage> {
   bool _isLoading = false;
 
   final GoogleSignInProviders _googleSignInProviders = GoogleSignInProviders();
+
+  int _failedAttempts = 0;
+  bool _isBlocked = false;
+  DateTime? _blockEndTime;
+
   Future<void> _signInWithEmailAndPassword() async {
-    if (_isLoading) return;
+    if (_isLoading || _isBlocked) return;
+
+    // Vérifiez si l'utilisateur est bloqué
+    if (_isBlocked) {
+      final remainingTime = _blockEndTime?.difference(DateTime.now()).inSeconds ?? 0;
+      _showErrorDialog('Please wait $remainingTime seconds before trying again.');
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -34,10 +46,14 @@ class AuthPageState extends State<AuthPage> {
         return;
       }
 
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      // Tentative de connexion
+      await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Réinitialisez les tentatives après une connexion réussie
+      _failedAttempts = 0;
 
       if (!mounted) return;
 
@@ -59,6 +75,20 @@ class AuthPageState extends State<AuthPage> {
         case 'invalid-email':
           errorMessage = 'Invalid email format';
           break;
+      }
+
+      // Incrémentez les tentatives échouées
+      _failedAttempts++;
+      if (_failedAttempts >= 3) {
+        _isBlocked = true;
+        _blockEndTime = DateTime.now().add(const Duration(seconds: 30)); // Blocage de 30 secondes
+        Future.delayed(const Duration(seconds: 30), () {
+          setState(() {
+            _isBlocked = false;
+            _failedAttempts = 0;
+          });
+        });
+        errorMessage = 'Too many failed attempts. Please try again later.';
       }
 
       _showErrorDialog(errorMessage);
@@ -156,6 +186,12 @@ class AuthPageState extends State<AuthPage> {
               ),
             ),
             const SizedBox(height: 32.0),
+            if (_isBlocked)
+              Text(
+                'You are temporarily blocked. Please wait ${_blockEndTime?.difference(DateTime.now()).inSeconds ?? 0} seconds.',
+                style: const TextStyle(color: Colors.red),
+              ),
+            const SizedBox(height: 8.0),
             _isLoading
                 ? const CircularProgressIndicator()
                 : SizedBox(
@@ -185,7 +221,7 @@ class AuthPageState extends State<AuthPage> {
             const SizedBox(height: 16.0),
             TextButton(
               onPressed: _isLoading ? null : _navigateToRegister,
-              child: const Text('No account ? Register'),
+              child: const Text('No account? Register'),
             ),
           ],
         ),
