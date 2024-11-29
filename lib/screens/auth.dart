@@ -69,7 +69,7 @@ class AuthPageState extends State<AuthPage> {
           errorMessage = 'No users found with this email.';
           break;
         case 'wrong-password':
-          errorMessage = 'Invalid email or password.';
+          errorMessage = 'Invalid password.';
           break;
         case 'invalid-email':
           errorMessage = 'The email format is invalid.';
