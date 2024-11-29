@@ -104,7 +104,7 @@ class _HomeState extends State<Home> {
                       Icon(Icons.logout, color: Colors.red, size: 20),
                       SizedBox(width: 8),
                       Text(
-                        'Se déconnecter',
+                        'Logout',
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 14,
@@ -504,7 +504,7 @@ class StatCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.blue,
+              color: Colors.orange,
             ),
           ),
         ],
