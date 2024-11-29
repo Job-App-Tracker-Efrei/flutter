@@ -134,7 +134,7 @@ class RegisterPageState extends State<RegisterPage> {
     );
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -144,12 +144,10 @@ class RegisterPageState extends State<RegisterPage> {
           children: [
             Image.asset(
               'assets/logo.png',
-              height: 150, 
+              height: 150,
               width: 150,
             ),
             const SizedBox(height: 16.0),
-
-            // Ajout du titre
             const Text(
               'S\'inscrire',
               style: TextStyle(
@@ -159,7 +157,6 @@ class RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 32.0),
-
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -184,20 +181,26 @@ class RegisterPageState extends State<RegisterPage> {
               ),
             ),
             const SizedBox(height: 32.0),
-            ElevatedButton(
-              onPressed: _registerWithEmailAndPassword,
-              child: const Text('S\'inscrire'),
+            SizedBox(
+              width: 300, // Ajuster la largeur des boutons
+              child: ElevatedButton(
+                onPressed: _registerWithEmailAndPassword,
+                child: const Text('S\'inscrire'),
+              ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _registerWithGoogle,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset('assets/logo-google.png', height: 24.0),
-                  const SizedBox(width: 8.0),
-                  const Text('S\'inscrire avec Google'),
-                ],
+            SizedBox(
+              width: 300, // Ajuster la largeur des boutons
+              child: ElevatedButton(
+                onPressed: _registerWithGoogle,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset('assets/logo-google.png', height: 24.0),
+                    const SizedBox(width: 8.0),
+                    const Text('S\'inscrire avec Google'),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16.0),

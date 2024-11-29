@@ -39,6 +39,7 @@ dependencies:
   firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
+  flutter_native_splash: ^2.4.3
 
 dev_dependencies:
   flutter_test:
@@ -95,3 +96,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+# Ajoutez cette section en bas de votre pubspec.yaml
+flutter_native_splash:
+  color: "#ffffff" # Couleur de fond du splash screen
+  image: assets/logo.png # Chemin de l'image à afficher
+  android: true # Activer pour Android
+  ios: true # Activer pour iOS
+  web: false # Désactiver pour le Web
+  android_gravity: center # Position de l'image sur Android
+  ios_content_mode: center # Position de l'image sur iOS

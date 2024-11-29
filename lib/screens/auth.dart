@@ -121,7 +121,7 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -131,12 +131,10 @@ class AuthPageState extends State<AuthPage> {
           children: [
             Image.asset(
               'assets/logo.png',
-              height: 150, 
+              height: 150,
               width: 150,
             ),
             const SizedBox(height: 16.0),
-
-            // Ajout du titre
             const Text(
               'Se connecter',
               style: TextStyle(
@@ -146,7 +144,6 @@ class AuthPageState extends State<AuthPage> {
               ),
             ),
             const SizedBox(height: 32.0),
-
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -165,22 +162,28 @@ class AuthPageState extends State<AuthPage> {
             const SizedBox(height: 32.0),
             _isLoading
                 ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _signInWithEmailAndPassword,
-                    child: const Text('Connexion'),
+                : SizedBox(
+                    width: 300, // Ajuster la largeur des boutons
+                    child: ElevatedButton(
+                      onPressed: _signInWithEmailAndPassword,
+                      child: const Text('Connexion'),
+                    ),
                   ),
             const SizedBox(height: 16.0),
             _isLoading
                 ? const SizedBox.shrink()
-                : ElevatedButton(
-                    onPressed: _signInWithGoogle,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset('assets/logo-google.png', height: 24.0),
-                        const SizedBox(width: 8.0),
-                        const Text('Connexion avec Google'),
-                      ],
+                : SizedBox(
+                    width: 300, // Ajuster la largeur des boutons
+                    child: ElevatedButton(
+                      onPressed: _signInWithGoogle,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset('assets/logo-google.png', height: 24.0),
+                          const SizedBox(width: 8.0),
+                          const Text('Connexion avec Google'),
+                        ],
+                      ),
                     ),
                   ),
             const SizedBox(height: 16.0),
