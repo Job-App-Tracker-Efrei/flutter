@@ -26,10 +26,11 @@ class AuthPageState extends State<AuthPage> {
   Future<void> _signInWithEmailAndPassword() async {
     if (_isLoading || _isBlocked) return;
 
-    // Vérifiez si l'utilisateur est bloqué
     if (_isBlocked) {
-      final remainingTime = _blockEndTime?.difference(DateTime.now()).inSeconds ?? 0;
-      _showErrorDialog('Please wait $remainingTime seconds before trying again.');
+      final remainingTime =
+          _blockEndTime?.difference(DateTime.now()).inSeconds ?? 0;
+      _showErrorDialog(
+          'Please wait $remainingTime seconds before trying again.');
       return;
     }
 
@@ -52,7 +53,6 @@ class AuthPageState extends State<AuthPage> {
         password: password,
       );
 
-      // Réinitialisez les tentatives après une connexion réussie
       _failedAttempts = 0;
 
       if (!mounted) return;
@@ -63,17 +63,19 @@ class AuthPageState extends State<AuthPage> {
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
-      String errorMessage = 'A connection error has occurred';
-
+      String errorMessage;
       switch (e.code) {
         case 'user-not-found':
-          errorMessage = 'No users found with this email';
+          errorMessage = 'No users found with this email.';
           break;
         case 'wrong-password':
-          errorMessage = 'Incorrect password';
+          errorMessage = 'Invalid email or password.';
           break;
         case 'invalid-email':
-          errorMessage = 'Invalid email format';
+          errorMessage = 'The email format is invalid.';
+          break;
+        default:
+          errorMessage = 'An unexpected error occurred: ${e.message}';
           break;
       }
 
@@ -81,7 +83,8 @@ class AuthPageState extends State<AuthPage> {
       _failedAttempts++;
       if (_failedAttempts >= 3) {
         _isBlocked = true;
-        _blockEndTime = DateTime.now().add(const Duration(seconds: 30)); // Blocage de 30 secondes
+        _blockEndTime = DateTime.now()
+            .add(const Duration(seconds: 30)); // Blocage de 30 secondes
         Future.delayed(const Duration(seconds: 30), () {
           setState(() {
             _isBlocked = false;
