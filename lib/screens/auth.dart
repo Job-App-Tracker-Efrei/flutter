@@ -121,7 +121,7 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -129,6 +129,24 @@ class AuthPageState extends State<AuthPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/logo.png',
+              height: 150, 
+              width: 150,
+            ),
+            const SizedBox(height: 16.0),
+
+            // Ajout du titre
+            const Text(
+              'Se connecter',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 32.0),
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(

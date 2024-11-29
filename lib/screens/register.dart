@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mobile/screens/auth.dart';
 import 'package:mobile/screens/home.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -133,7 +134,7 @@ class RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -141,6 +142,24 @@ class RegisterPageState extends State<RegisterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Image.asset(
+              'assets/logo.png',
+              height: 150, 
+              width: 150,
+            ),
+            const SizedBox(height: 16.0),
+
+            // Ajout du titre
+            const Text(
+              'S\'inscrire',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 32.0),
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(
@@ -185,7 +204,9 @@ class RegisterPageState extends State<RegisterPage> {
             TextButton(
               onPressed: () {
                 // Naviguez vers la page de connexion
-                // Navigator.of(context).push(...)
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
+                );
               },
               child: const Text('Déjà un compte ? Connectez-vous'),
             ),

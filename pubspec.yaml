@@ -71,6 +71,7 @@ flutter:
   # https://flutter.dev/to/resolution-aware-images
   assets:
     - assets/logo-google.png
+    - assets/logo.png
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
