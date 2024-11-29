@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
           // Handle case where id is null (maybe show an error)
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Impossible de supprimer cette candidature'),
+              content: Text('Impossible to delete this application'),
               backgroundColor: Colors.red,
             ),
           );
@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erreur lors de la déconnexion : ${e.toString()}'),
+          content: Text('Disconnection error : ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -86,7 +86,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Suivi des Candidatures'),
+        title: const Text('Application follow-up'),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.menu),
@@ -136,11 +136,11 @@ class _HomeState extends State<Home> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Aucune candidature trouvée'),
+                  const Text('No applications found'),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _ajouterCandidature,
-                    child: const Text('Ajouter une candidature'),
+                    child: const Text('Add an application'),
                   ),
                 ],
               ),
@@ -161,24 +161,24 @@ class _HomeState extends State<Home> {
                     runSpacing: 16,
                     children: [
                       StatCard(
-                          title: 'Candidatures\ntotales',
+                          title: 'Total applications',
                           value: candidatures.length.toString()),
                       StatCard(
-                          title: 'En cours',
+                          title: 'In progress',
                           value: candidatures
                               .where((c) =>
                                   c.status == JobApplicationStatus.pending)
                               .length
                               .toString()),
                       StatCard(
-                          title: 'Acceptées',
+                          title: 'Accepted',
                           value: candidatures
                               .where((c) =>
                                   c.status == JobApplicationStatus.accepted)
                               .length
                               .toString()),
                       StatCard(
-                          title: 'Refusées',
+                          title: 'Refused',
                           value: candidatures
                               .where((c) =>
                                   c.status == JobApplicationStatus.rejected)
@@ -191,7 +191,7 @@ class _HomeState extends State<Home> {
                   Row(
                     children: [
                       const Text(
-                        'Entreprise',
+                        'Company',
                         style: TextStyle(fontSize: 16),
                       ),
                       const SizedBox(width: 16),
@@ -201,7 +201,7 @@ class _HomeState extends State<Home> {
                           child: TextField(
                             controller: _searchController,
                             decoration: InputDecoration(
-                              hintText: 'Nom de l\'entreprise',
+                              hintText: 'Company name',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -216,7 +216,7 @@ class _HomeState extends State<Home> {
                         onPressed: () {
                           // TODO: Implement search functionality
                         },
-                        child: const Text('Filtrer'),
+                        child: const Text('Filter', style: TextStyle(color: Colors.orange),),     
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
@@ -233,9 +233,9 @@ class _HomeState extends State<Home> {
                       columnSpacing: 40,
                       showCheckboxColumn: false,
                       columns: const [
-                        DataColumn(label: Text('Entreprise')),
-                        DataColumn(label: Text('Poste')),
-                        DataColumn(label: Text('Statut')),
+                        DataColumn(label: Text('Company')),
+                        DataColumn(label: Text('Position')),
+                        DataColumn(label: Text('Status')),
                         DataColumn(label: Text('Date')),
                       ],
                       rows: candidatures.map((candidature) {
@@ -289,11 +289,11 @@ class _HomeState extends State<Home> {
   String _getStatusText(JobApplicationStatus statut) {
     switch (statut) {
       case JobApplicationStatus.pending:
-        return 'En cours';
+        return 'In progress';
       case JobApplicationStatus.accepted:
-        return 'Accepté';
+        return 'Accepted';
       case JobApplicationStatus.rejected:
-        return 'Refusé';
+        return 'Refused';
     }
   }
 }
@@ -337,11 +337,11 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
   String _getStatusText(JobApplicationStatus status) {
     switch (status) {
       case JobApplicationStatus.pending:
-        return 'En cours';
+        return 'In progress';
       case JobApplicationStatus.accepted:
-        return 'Accepté';
+        return 'Accepted';
       case JobApplicationStatus.rejected:
-        return 'Refusé';
+        return 'Refused';
     }
   }
 
@@ -349,7 +349,7 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text(
-        'Nouvelle Candidature',
+        'New Application',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -363,12 +363,12 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
             TextFormField(
               controller: _entrepriseController,
               decoration: const InputDecoration(
-                labelText: 'Entreprise',
+                labelText: 'Company',
                 border: OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer le nom de l\'entreprise';
+                  return 'Please enter the company name';
                 }
                 return null;
               },
@@ -382,7 +382,7 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Veuillez entrer le nom du poste';
+                  return 'Please enter the job name';
                 }
                 return null;
               },
@@ -413,8 +413,8 @@ class _AddCandidatureModalState extends State<AddCandidatureModal> {
                 Expanded(
                   child: Text(
                     _datePostulation != null
-                        ? 'Date de postulation: ${_datePostulation!.day}/${_datePostulation!.month}/${_datePostulation!.year}'
-                        : 'Aucune date sélectionnée',
+                        ? 'Application date: ${_datePostulation!.day}/${_datePostulation!.month}/${_datePostulation!.year}'
+                        : 'No date selected',
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),

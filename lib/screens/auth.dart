@@ -30,7 +30,7 @@ class AuthPageState extends State<AuthPage> {
       final String password = _passwordController.text.trim();
 
       if (email.isEmpty || password.isEmpty) {
-        _showErrorDialog('Veuillez saisir un email et un mot de passe');
+        _showErrorDialog('Please enter your email and password');
         return;
       }
 
@@ -39,33 +39,30 @@ class AuthPageState extends State<AuthPage> {
         password: password,
       );
 
-      // Vérifiez que le widget est toujours monté avant de naviguer
       if (!mounted) return;
 
-      // Naviguez vers la page d'accueil
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const Home()),
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
-      String errorMessage = 'Une erreur de connexion est survenue';
+      String errorMessage = 'A connection error has occurred';
 
       switch (e.code) {
         case 'user-not-found':
-          errorMessage = 'Aucun utilisateur trouvé avec cet email';
+          errorMessage = 'No users found with this email';
           break;
         case 'wrong-password':
-          errorMessage = 'Mot de passe incorrect';
+          errorMessage = 'Incorrect password';
           break;
         case 'invalid-email':
-          errorMessage = 'Format d\'email invalide';
+          errorMessage = 'Invalid email format';
           break;
       }
 
       _showErrorDialog(errorMessage);
     } finally {
-      // Vérifiez que le widget est toujours monté avant de mettre à jour l'état
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -82,12 +79,11 @@ class AuthPageState extends State<AuthPage> {
     });
 
     try {
-      // Call the googleLogin method from your provider
       await _googleSignInProviders.googleLogin(context);
     } catch (e) {
       if (!mounted) return;
 
-      _showErrorDialog('Erreur lors de la connexion avec Google');
+      _showErrorDialog('Error connecting to Google');
     } finally {
       if (mounted) {
         setState(() {
@@ -107,7 +103,7 @@ class AuthPageState extends State<AuthPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Erreur'),
+        title: const Text('Error'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
@@ -136,7 +132,7 @@ class AuthPageState extends State<AuthPage> {
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'Se connecter',
+              'Login',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -156,24 +152,24 @@ class AuthPageState extends State<AuthPage> {
               controller: _passwordController,
               obscureText: true,
               decoration: const InputDecoration(
-                hintText: 'Mot de passe',
+                hintText: 'Password',
               ),
             ),
             const SizedBox(height: 32.0),
             _isLoading
                 ? const CircularProgressIndicator()
                 : SizedBox(
-                    width: 300, // Ajuster la largeur des boutons
+                    width: 300,
                     child: ElevatedButton(
                       onPressed: _signInWithEmailAndPassword,
-                      child: const Text('Connexion'),
+                      child: const Text('Connection'),
                     ),
                   ),
             const SizedBox(height: 16.0),
             _isLoading
                 ? const SizedBox.shrink()
                 : SizedBox(
-                    width: 300, // Ajuster la largeur des boutons
+                    width: 300,
                     child: ElevatedButton(
                       onPressed: _signInWithGoogle,
                       child: Row(
@@ -181,7 +177,7 @@ class AuthPageState extends State<AuthPage> {
                         children: [
                           Image.asset('assets/logo-google.png', height: 24.0),
                           const SizedBox(width: 8.0),
-                          const Text('Connexion avec Google'),
+                          const Text('Connection with Google'),
                         ],
                       ),
                     ),
@@ -189,7 +185,7 @@ class AuthPageState extends State<AuthPage> {
             const SizedBox(height: 16.0),
             TextButton(
               onPressed: _isLoading ? null : _navigateToRegister,
-              child: const Text('Pas de compte ? S\'inscrire'),
+              child: const Text('No account ? Register'),
             ),
           ],
         ),

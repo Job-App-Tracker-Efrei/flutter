@@ -25,19 +25,19 @@ class RegisterPageState extends State<RegisterPage> {
 
       // Validation des champs
       if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-        _showErrorDialog('Tous les champs sont obligatoires');
+        _showErrorDialog('All fields are mandatory');
         return;
       }
 
       // Vérification de la correspondance des mots de passe
       if (password != confirmPassword) {
-        _showErrorDialog('Les mots de passe ne correspondent pas');
+        _showErrorDialog('Passwords do not match');
         return;
       }
 
       // Validation de la force du mot de passe
       if (password.length < 8) {
-        _showErrorDialog('Le mot de passe doit contenir au moins 8 caractères');
+        _showErrorDialog('Password must contain at least 8 characters');
         return;
       }
 
@@ -52,17 +52,17 @@ class RegisterPageState extends State<RegisterPage> {
         MaterialPageRoute(builder: (context) => const Home()),
       );
     } on FirebaseAuthException catch (e) {
-      String errorMessage = 'Une erreur est survenue lors de l\'inscription';
+      String errorMessage = 'An error occurred during registration';
 
       switch (e.code) {
         case 'email-already-in-use':
-          errorMessage = 'Cet email est déjà utilisé';
+          errorMessage = 'This email is already in use';
           break;
         case 'invalid-email':
-          errorMessage = 'Format d\'email invalide';
+          errorMessage = 'Invalid email format';
           break;
         case 'weak-password':
-          errorMessage = 'Le mot de passe est trop faible';
+          errorMessage = 'The password is too weak';
           break;
       }
 
@@ -92,7 +92,7 @@ class RegisterPageState extends State<RegisterPage> {
         MaterialPageRoute(builder: (context) => const Home()),
       );
     } catch (e) {
-      _showErrorDialog('Échec de l\'inscription avec Google');
+      _showErrorDialog('Registration failure with Google');
     }
   }
 
@@ -100,7 +100,7 @@ class RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Erreur'),
+        title: const Text('Error'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
@@ -118,7 +118,7 @@ class RegisterPageState extends State<RegisterPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Succès'),
+        title: const Text('Success'),
         content: Text(message),
         actions: <Widget>[
           TextButton(
@@ -149,7 +149,7 @@ class RegisterPageState extends State<RegisterPage> {
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'S\'inscrire',
+              'Register',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -169,7 +169,7 @@ class RegisterPageState extends State<RegisterPage> {
               controller: _passwordController,
               obscureText: true,
               decoration: const InputDecoration(
-                hintText: 'Mot de passe',
+                hintText: 'Password',
               ),
             ),
             const SizedBox(height: 16.0),
@@ -177,7 +177,7 @@ class RegisterPageState extends State<RegisterPage> {
               controller: _confirmPasswordController,
               obscureText: true,
               decoration: const InputDecoration(
-                hintText: 'Confirmer le mot de passe',
+                hintText: 'Confirm password',
               ),
             ),
             const SizedBox(height: 32.0),
@@ -185,7 +185,7 @@ class RegisterPageState extends State<RegisterPage> {
               width: 300, // Ajuster la largeur des boutons
               child: ElevatedButton(
                 onPressed: _registerWithEmailAndPassword,
-                child: const Text('S\'inscrire'),
+                child: const Text('Register'),
               ),
             ),
             const SizedBox(height: 16.0),
@@ -198,7 +198,7 @@ class RegisterPageState extends State<RegisterPage> {
                   children: [
                     Image.asset('assets/logo-google.png', height: 24.0),
                     const SizedBox(width: 8.0),
-                    const Text('S\'inscrire avec Google'),
+                    const Text('Register with Google'),
                   ],
                 ),
               ),
@@ -211,7 +211,7 @@ class RegisterPageState extends State<RegisterPage> {
                   MaterialPageRoute(builder: (context) => const AuthPage()),
                 );
               },
-              child: const Text('Déjà un compte ? Connectez-vous'),
+              child: const Text('Already have an account? Log in at'),
             ),
           ],
         ),
