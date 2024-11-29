@@ -3,7 +3,7 @@
 A Flutter project demonstrating mobile app development.
 
 
-## Auteur
+## Authors
 
 - Chahine Benlahcen Tlemcani
 - Aymene BOUSBIA
