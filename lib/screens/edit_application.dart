@@ -59,7 +59,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Modifier la candidature'),
+        title: const Text('Modify application'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -71,7 +71,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
               TextFormField(
                 controller: _entrepriseController,
                 decoration: InputDecoration(
-                  labelText: 'Entreprise',
+                  labelText: 'Company',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -79,7 +79,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le nom de l\'entreprise';
+                    return 'Please enter the company name';
                   }
                   return null;
                 },
@@ -88,7 +88,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
               TextFormField(
                 controller: _posteController,
                 decoration: InputDecoration(
-                  labelText: 'Poste',
+                  labelText: 'Position',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -96,7 +96,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Veuillez entrer le nom du poste';
+                    return 'Please enter the job name';
                   }
                   return null;
                 },
@@ -129,7 +129,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Date de postulation: ${_datePostulation.day}/${_datePostulation.month}/${_datePostulation.year}',
+                      'Application date: ${_datePostulation.day}/${_datePostulation.month}/${_datePostulation.year}',
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
@@ -163,7 +163,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     ),
-                    child: const Text('Enregistrer'),
+                    child: const Text('Save'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -177,7 +177,7 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       backgroundColor: Colors.red, // Couleur rouge pour indiquer la suppression
                     ),
-                    child: const Text('Supprimer',
+                    child: const Text('Delete',
                       style: TextStyle(color: Colors.white),
                     )
                   ),
@@ -193,11 +193,11 @@ class _EditCandidaturePageState extends State<EditCandidaturePage> {
   String _getStatusText(JobApplicationStatus status) {
     switch (status) {
       case JobApplicationStatus.pending:
-        return 'En cours';
+        return 'In progress';
       case JobApplicationStatus.accepted:
-        return 'Accepté';
+        return 'Accepted';
       case JobApplicationStatus.rejected:
-        return 'Refusé';
+        return 'Refused';
       default:
         return '';
     }

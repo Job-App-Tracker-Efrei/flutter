@@ -11,30 +11,43 @@ class GoogleSignInProviders extends ChangeNotifier {
   GoogleSignInAccount get user => _user!;
 
   Future googleLogin(BuildContext context) async {
-    final googleUser = await googleSignInProviders.signIn();
-    if(googleUser == null) return;
-    _user = googleUser;
+    try {
+      final googleUser = await googleSignInProviders.signIn();
+      if (googleUser == null) return;
+      _user = googleUser;
 
-    final googleAuth = await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    
-      try {
-        await FirebaseAuth.instance.signInWithCredential((credential)).then((value) async {
-          if (value.user != null) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const Home()),
-                (route) => false);
-              }
-        });    
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Home()),
+            (route) => false);
       }
-      catch(e) {
-        print("error");
-      }
-    notifyListeners();
+
+      notifyListeners();
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Error signing in with Google: $e'),
+            backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unknown error occurred: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-} 
+}

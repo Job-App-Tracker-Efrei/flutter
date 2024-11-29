@@ -4,6 +4,7 @@ import 'package:mobile/wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Future.delayed(const Duration(seconds: 2));
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Suivi des Candidatures',
+      title: 'Application follow-up',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
